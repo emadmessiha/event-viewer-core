@@ -1,0 +1,37 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"files.exclude": {
+			"**/.classpath": true,
+			"**/.project": true,
+			"**/.settings": true,
+			"**/.factorypath": true
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"hookyqr.beautify",
+			"shengchen.vscode-checkstyle",
+			"vscjava.vscode-java-debug",
+			"ms-azuretools.vscode-docker",
+			"alphabotsec.vscode-eclipse-keybindings",
+			"vscjava.vscode-java-dependency",
+			"vscjava.vscode-java-pack",
+			"vscjava.vscode-java-test",
+			"redhat.java",
+			"yzhang.markdown-all-in-one",
+			"vscjava.vscode-maven",
+			"davidanson.vscode-markdownlint",
+			"dotjoshjohnson.xml",
+			"redhat.vscode-xml",
+			"vscjava.vscode-spring-boot-dashboard",
+			"pivotal.vscode-spring-boot",
+			"vscjava.vscode-spring-initializr"
+		]
+	}
+}
