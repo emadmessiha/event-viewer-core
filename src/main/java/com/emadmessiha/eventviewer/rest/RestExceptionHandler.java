@@ -14,7 +14,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ Exception.class })
     protected ResponseEntity<Object> handleServerException(
       Exception ex, WebRequest request) {
-        return handleExceptionInternal(ex, "Internal Server Error", 
-          new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+        ex.printStackTrace();
+        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        return handleExceptionInternal(ex, statusCode.name(), 
+          new HttpHeaders(), statusCode, request);
+    }
+
+    @ExceptionHandler({ IllegalArgumentException.class })
+    protected ResponseEntity<Object> handleBadRequestException(
+      Exception ex, WebRequest request) {
+        ex.printStackTrace();
+        return handleExceptionInternal(ex, HttpStatus.BAD_REQUEST.name(), 
+          new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }
