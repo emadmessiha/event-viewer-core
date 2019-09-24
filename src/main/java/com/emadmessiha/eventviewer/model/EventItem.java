@@ -35,4 +35,8 @@ public class EventItem {
             .append("event_size", this.event_size)
             .append("event_details", this.event_details);
     }
+
+    public String toString() {
+        return this.object_id;
+    }
 }
