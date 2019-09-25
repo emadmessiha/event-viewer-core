@@ -1,11 +1,14 @@
 package com.emadmessiha.eventviewer.service;
 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import com.emadmessiha.eventviewer.model.EventItem;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -17,6 +20,10 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,8 +33,17 @@ public class EventViewerServiceImpl implements IEventViewerService {
 
     private final String EVENTS = "events";
 
+    @Value("${spring.data.mongodb.uri}")
+    private String mongodbUri;
+
+    @Value("${jsondata.resourcepath}")
+    private String jsonDataResourcePath;
+
+    @Autowired
+    ResourceLoader resourceLoader;
+
     private MongoClient getMongoClient(){
-        return new MongoClient(new MongoClientURI("mongodb://root:root@localhost"));
+        return new MongoClient(new MongoClientURI(mongodbUri));
     }
 
     private MongoCollection<Document> getEventsCollection(MongoClient mongoClient) {
@@ -93,5 +109,29 @@ public class EventViewerServiceImpl implements IEventViewerService {
         }
 
         return new EventItem(returnedDoc);
+    }
+
+    @Override
+    public Boolean reloadSeedData() {
+        MongoClient mongoClient = getMongoClient();
+        MongoCollection<Document> collection = getEventsCollection(mongoClient);
+        Boolean success = true;
+        Gson gson = new Gson();
+        try {
+            Resource resource = resourceLoader.getResource(jsonDataResourcePath);
+            JsonReader reader = new JsonReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
+            reader.beginArray();
+            while (reader.hasNext()) {
+                EventItem event = gson.fromJson(reader, EventItem.class);
+                collection.insertOne(event.toBSONDocument());
+            }
+            reader.endArray();
+            reader.close();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            success = false;
+        }
+        mongoClient.close();
+        return success;
     }
 }

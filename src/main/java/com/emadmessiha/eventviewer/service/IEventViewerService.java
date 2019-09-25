@@ -10,4 +10,6 @@ public interface IEventViewerService {
     List<EventItem> searchEvents(Date startDate, Integer numberOfDays);
 
     EventItem getEventDetails(String objectId);
+
+    Boolean reloadSeedData();
 }
