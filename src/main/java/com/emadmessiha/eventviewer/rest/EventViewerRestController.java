@@ -3,6 +3,7 @@ package com.emadmessiha.eventviewer.rest;
 import java.util.Date;
 
 import com.emadmessiha.eventviewer.model.EventItem;
+import com.emadmessiha.eventviewer.model.EventsSource;
 import com.emadmessiha.eventviewer.model.PagedEventResults;
 import com.emadmessiha.eventviewer.service.IEventViewerService;
 
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,10 +42,13 @@ public class EventViewerRestController {
             return eventsService.getEventDetails(id);
     }
 
-    @PostMapping("/reload")
-    public ResponseEntity<Object> reloadSeedData() {
-        return eventsService.reloadSeedData() ? 
-            new ResponseEntity<>(HttpStatus.CREATED) : 
-            new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    @PostMapping("/load")
+    public ResponseEntity<Object> reloadSeedData(@RequestBody EventsSource dataSource) {
+        Exception loadException = eventsService.loadData(dataSource);
+        if (loadException == null) { 
+            return new ResponseEntity<>("Created", HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(loadException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

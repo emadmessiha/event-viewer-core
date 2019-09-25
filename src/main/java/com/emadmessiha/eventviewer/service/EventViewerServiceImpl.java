@@ -1,12 +1,21 @@
 package com.emadmessiha.eventviewer.service;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.emadmessiha.eventviewer.model.EventItem;
+import com.emadmessiha.eventviewer.model.EventsSource;
 import com.emadmessiha.eventviewer.model.PagedEventResults;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -23,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +44,6 @@ public class EventViewerServiceImpl implements IEventViewerService {
 
     @Value("${spring.data.mongodb.uri}")
     private String mongodbUri;
-
-    @Value("${jsondata.resourcepath}")
-    private String jsonDataResourcePath;
 
     @Autowired
     ResourceLoader resourceLoader;
@@ -148,14 +153,77 @@ public class EventViewerServiceImpl implements IEventViewerService {
     }
 
     @Override
-    public Boolean reloadSeedData() {
+    public Exception loadData(EventsSource source) {
+        try {
+            String filePath = "data.json";
+            String filePathZipped = "data.zip";
+            BufferedInputStream inputStream = new BufferedInputStream(source.url().openStream());
+            FileOutputStream fileOS = new FileOutputStream(source.getIsZipped() ? filePathZipped : filePath);
+            byte data[] = new byte[1024];
+            int byteContent;
+            while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
+                fileOS.write(data, 0, byteContent);
+            }
+            fileOS.close();
+            Exception unzipResult = null;
+            if (source.getIsZipped()) {
+                unzipResult = unzipDataFile(filePathZipped);
+            }
+            if (unzipResult == null) {
+                return loadDataFromJsonFile(filePath);
+            } else {
+                return unzipResult;
+            }
+        } catch (Exception e) {
+            return e;
+        }
+    }
+
+    public Exception unzipDataFile(String fileZip) {
+        try {
+            File destDir = new File(fileZip.replace(".zip", ".json"));
+            byte[] buffer = new byte[1024];
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                File newFile = newFile(destDir, zipEntry);
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+            zis.close();
+            return null;
+        } catch (Exception ex) {
+            return ex;
+        }
+    }
+
+    public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+         
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+         
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+         
+        return destFile;
+    }
+
+    public Exception loadDataFromJsonFile(String filePath) {
         MongoClient mongoClient = getMongoClient();
         MongoCollection<Document> collection = getEventsCollection(mongoClient);
-        Boolean success = true;
         Gson gson = new Gson();
         try {
-            Resource resource = resourceLoader.getResource(jsonDataResourcePath);
-            JsonReader reader = new JsonReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
+            File initialFile = new File(filePath);
+            InputStream targetStream = new FileInputStream(initialFile);
+            JsonReader reader = new JsonReader(new InputStreamReader(targetStream, "UTF-8"));
             reader.beginArray();
             collection.drop();
             while (reader.hasNext()) {
@@ -165,10 +233,9 @@ public class EventViewerServiceImpl implements IEventViewerService {
             reader.endArray();
             reader.close();
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
-            success = false;
+            return ex;
         }
         mongoClient.close();
-        return success;
+        return null;
     }
 }

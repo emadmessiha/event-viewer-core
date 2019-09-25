@@ -3,6 +3,7 @@ package com.emadmessiha.eventviewer.service;
 import java.util.Date;
 
 import com.emadmessiha.eventviewer.model.EventItem;
+import com.emadmessiha.eventviewer.model.EventsSource;
 import com.emadmessiha.eventviewer.model.PagedEventResults;
 
 public interface IEventViewerService {
@@ -11,5 +12,5 @@ public interface IEventViewerService {
 
     EventItem getEventDetails(String objectId);
 
-    Boolean reloadSeedData();
+    Exception loadData(EventsSource source);
 }
