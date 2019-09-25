@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.emadmessiha.eventviewer.model.EventItem;
+import com.emadmessiha.eventviewer.model.PagedEventResults;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.mongodb.BasicDBObject;
@@ -76,23 +77,58 @@ public class EventViewerServiceImpl implements IEventViewerService {
         return items;
     }
 
-    @Override
-    public List<EventItem> searchEvents(Date startDate, Integer numberOfDays) {
+    private Integer getTotalPages(Integer totalResults, Integer pageSize) {
+        if (totalResults % pageSize == 0) {
+            return totalResults / pageSize;
+        } else {
+            return totalResults / pageSize + 1;
+        }
+    }
+
+    public PagedEventResults getPagedResultsByQuery(MongoCollection<Document> collection, BasicDBObject query, Integer pageSize, Integer pageNumber) {
+        PagedEventResults pagedResults = new PagedEventResults();
+
+        FindIterable<Document> results = collection.find(query)
+                .projection(getFieldsForSearchResults())
+                .skip(pageSize * (pageNumber - 1)).limit(pageSize);
+        Integer numResults = Math.toIntExact(collection.countDocuments(query));
+            
+        pagedResults.setTotalResults(numResults);
+        pagedResults.setPage(pageNumber);
+        pagedResults.setPageSize(pageSize);
+        pagedResults.setTotalPages(getTotalPages(numResults, pageSize));
+        pagedResults.setData(convertDocumentsToEventItems(results));
+        return pagedResults;
+    }
+
+    public Boolean isValidSearchRequest(Integer numberOfDays, Integer pageSize, Integer pageNumber) {
         if (numberOfDays > 90) {
             // 3 month, which is a quarter
             throw new IllegalArgumentException("Number of days duration cannot exceed 90 days");
-        } else {
+        }
+        if (pageSize == null || pageSize < 0) {
+            throw new IllegalArgumentException("Page size cannot be empty or less than zero");
+        }
+        if (pageNumber == null || pageNumber < 0) {
+            throw new IllegalArgumentException("Page number cannot be empty or less than zero");
+        }
+        return true;
+    }
+
+    @Override
+    public PagedEventResults searchEvents(Date startDate, Integer numberOfDays, Integer pageSize, Integer pageNumber) {
+        if (isValidSearchRequest(numberOfDays, pageSize, pageNumber)) {
             MongoClient mongoClient = getMongoClient();
             MongoCollection<Document> collection = getEventsCollection(mongoClient);
             
             Date endDate = getEndDateByNumberOfDays(startDate, numberOfDays);
 
             BasicDBObject query = new BasicDBObject("event_date", new BasicDBObject("$gte", startDate).append("$lt", endDate));
-            FindIterable<Document> results = collection.find(query).projection(getFieldsForSearchResults());
-            
-            List<EventItem> items = convertDocumentsToEventItems(results);
+            PagedEventResults items = getPagedResultsByQuery(collection, query, pageSize, pageNumber);
             mongoClient.close();
             return items;
+        } else {
+            return new PagedEventResults();
         }
     }
 
@@ -121,6 +157,7 @@ public class EventViewerServiceImpl implements IEventViewerService {
             Resource resource = resourceLoader.getResource(jsonDataResourcePath);
             JsonReader reader = new JsonReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
             reader.beginArray();
+            collection.drop();
             while (reader.hasNext()) {
                 EventItem event = gson.fromJson(reader, EventItem.class);
                 collection.insertOne(event.toBSONDocument());

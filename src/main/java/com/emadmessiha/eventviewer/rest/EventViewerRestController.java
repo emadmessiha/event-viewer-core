@@ -1,9 +1,9 @@
 package com.emadmessiha.eventviewer.rest;
 
 import java.util.Date;
-import java.util.List;
 
 import com.emadmessiha.eventviewer.model.EventItem;
+import com.emadmessiha.eventviewer.model.PagedEventResults;
 import com.emadmessiha.eventviewer.service.IEventViewerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,10 +26,12 @@ public class EventViewerRestController {
     IEventViewerService eventsService;
  
     @GetMapping("/search/{startDate}/{numberOfDays}")
-    public List<EventItem> searchEvents(
+    public PagedEventResults searchEvents(
         @PathVariable("startDate") @DateTimeFormat(iso = ISO.DATE) Date startDate, 
-        @PathVariable("numberOfDays") Integer numberOfDays) {
-            return eventsService.searchEvents(startDate, numberOfDays);
+        @PathVariable("numberOfDays") Integer numberOfDays,
+        @RequestParam Integer page,
+        @RequestParam Integer pageSize) {
+            return eventsService.searchEvents(startDate, numberOfDays, pageSize, page);
     }
 
     @GetMapping("/{id}")

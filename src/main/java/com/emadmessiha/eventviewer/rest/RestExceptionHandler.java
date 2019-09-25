@@ -16,7 +16,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       Exception ex, WebRequest request) {
         ex.printStackTrace();
         HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-        return handleExceptionInternal(ex, statusCode.name(), 
+        return handleExceptionInternal(ex, statusCode.name() + " " + ex.getMessage(),
           new HttpHeaders(), statusCode, request);
     }
 
@@ -24,7 +24,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleBadRequestException(
       Exception ex, WebRequest request) {
         ex.printStackTrace();
-        return handleExceptionInternal(ex, HttpStatus.BAD_REQUEST.name(), 
+        return handleExceptionInternal(ex, HttpStatus.BAD_REQUEST.name() + " " + ex.getMessage(), 
           new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.emadmessiha</groupId>
 	<artifactId>eventviewer</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>eventviewer</name>
 	<description>Java Spring Boot Event Viewer Core</description>
 

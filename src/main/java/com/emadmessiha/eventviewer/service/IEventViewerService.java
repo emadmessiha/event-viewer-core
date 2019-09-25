@@ -1,13 +1,13 @@
 package com.emadmessiha.eventviewer.service;
 
 import java.util.Date;
-import java.util.List;
 
 import com.emadmessiha.eventviewer.model.EventItem;
+import com.emadmessiha.eventviewer.model.PagedEventResults;
 
 public interface IEventViewerService {
 
-    List<EventItem> searchEvents(Date startDate, Integer numberOfDays);
+    PagedEventResults searchEvents(Date startDate, Integer numberOfDays, Integer pageSize, Integer pageNumber);
 
     EventItem getEventDetails(String objectId);
 
