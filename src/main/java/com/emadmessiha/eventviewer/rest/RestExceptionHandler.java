@@ -10,21 +10,25 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
- 
-    @ExceptionHandler({ Exception.class })
-    protected ResponseEntity<Object> handleServerException(
-      Exception ex, WebRequest request) {
-        ex.printStackTrace();
-        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-        return handleExceptionInternal(ex, statusCode.name() + " " + ex.getMessage(),
-          new HttpHeaders(), statusCode, request);
-    }
 
-    @ExceptionHandler({ IllegalArgumentException.class })
-    protected ResponseEntity<Object> handleBadRequestException(
-      Exception ex, WebRequest request) {
-        ex.printStackTrace();
-        return handleExceptionInternal(ex, HttpStatus.BAD_REQUEST.name() + " " + ex.getMessage(), 
-          new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-    }
+  public String getExceptionResponseBody(Exception ex) {
+    return ex.getClass().getName() + ": " + ex.getMessage();
+  }
+ 
+  @ExceptionHandler({ Exception.class })
+  protected ResponseEntity<Object> handleServerException(
+    Exception ex, WebRequest request) {
+      ex.printStackTrace();
+      HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      return handleExceptionInternal(ex, statusCode.name() + " " + getExceptionResponseBody(ex),
+        new HttpHeaders(), statusCode, request);
+  }
+
+  @ExceptionHandler({ IllegalArgumentException.class })
+  protected ResponseEntity<Object> handleBadRequestException(
+    Exception ex, WebRequest request) {
+      ex.printStackTrace();
+      return handleExceptionInternal(ex, HttpStatus.BAD_REQUEST.name() + " " + getExceptionResponseBody(ex), 
+        new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+  }
 }

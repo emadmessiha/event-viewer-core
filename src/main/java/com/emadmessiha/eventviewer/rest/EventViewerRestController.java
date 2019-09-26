@@ -42,12 +42,13 @@ public class EventViewerRestController {
             return eventsService.getEventDetails(id);
     }
 
-    @PostMapping("/load")
-    public ResponseEntity<Object> reloadSeedData(@RequestBody EventsSource dataSource) {
+    @PostMapping("/import")
+    public ResponseEntity<Object> importData(@RequestBody EventsSource dataSource) {
         Exception loadException = eventsService.loadData(dataSource);
         if (loadException == null) { 
             return new ResponseEntity<>("Created", HttpStatus.CREATED);
         } else {
+            loadException.printStackTrace();
             return new ResponseEntity<>(loadException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

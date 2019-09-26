@@ -4,9 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -157,6 +158,8 @@ public class EventViewerServiceImpl implements IEventViewerService {
         try {
             String filePath = "data.json";
             String filePathZipped = "data.zip";
+            Files.deleteIfExists(Paths.get(filePath));
+            Files.deleteIfExists(Paths.get(filePathZipped));
             BufferedInputStream inputStream = new BufferedInputStream(source.url().openStream());
             FileOutputStream fileOS = new FileOutputStream(source.getIsZipped() ? filePathZipped : filePath);
             byte data[] = new byte[1024];
@@ -181,13 +184,12 @@ public class EventViewerServiceImpl implements IEventViewerService {
 
     public Exception unzipDataFile(String fileZip) {
         try {
-            File destDir = new File(fileZip.replace(".zip", ".json"));
+            String outputFileName = "data.json";
             byte[] buffer = new byte[1024];
             ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
-                File newFile = newFile(destDir, zipEntry);
-                FileOutputStream fos = new FileOutputStream(newFile);
+                FileOutputStream fos = new FileOutputStream(outputFileName);
                 int len;
                 while ((len = zis.read(buffer)) > 0) {
                     fos.write(buffer, 0, len);
@@ -201,19 +203,6 @@ public class EventViewerServiceImpl implements IEventViewerService {
         } catch (Exception ex) {
             return ex;
         }
-    }
-
-    public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-         
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-         
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-         
-        return destFile;
     }
 
     public Exception loadDataFromJsonFile(String filePath) {
