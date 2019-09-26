@@ -1,10 +1,11 @@
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+!.mvn/wrapper/MavenWrapperDownloader.java
 !**/src/main/**
 !**/src/test/**
 .mvn
-*.zip
 
 ### STS ###
 .apt_generated
@@ -34,3 +35,4 @@ build/
 
 ### Test Data ###
 data.json
+data.zip
