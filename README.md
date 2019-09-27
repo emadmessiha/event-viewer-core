@@ -28,7 +28,7 @@ You can edit the code through Visual Studio code by using the VS code Workspace 
 1. Make sure you package the application first by running from within the project directory:
    `./mvnw clean install`
 2. Then run the Docker build command:
-   `docker build -t event-viewer-core -f Dockerfile_ev_core .`
+   `docker build -t event-viewer-core .`
 3. Lastly, run the following command to start the application through the built Docker image:
    `docker run -p 8080:8080 event-viewer-core`
    NOTE: Make sure the application is not already running through the IDE or another process. Otherwise there will be a port conflict.
