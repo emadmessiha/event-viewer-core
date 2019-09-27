@@ -5,7 +5,7 @@ steps:
 
   # Build & push docker image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/event-viewer-253305/event-viewer-core', '.']
+  args: ['build', '-t', 'gcr.io/event-viewer-253305/event-viewer-core', './Dockerfile_ev_core']
 
   # Deploy app
 - name: 'gcr.io/cloud-builders/gcloud'
