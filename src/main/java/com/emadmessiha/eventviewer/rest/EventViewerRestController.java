@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ public class EventViewerRestController {
     @Autowired
     IEventViewerService eventsService;
  
+    @CrossOrigin
     @GetMapping("/search/{startDate}/{numberOfDays}")
     public PagedEventResults searchEvents(
         @PathVariable("startDate") @DateTimeFormat(iso = ISO.DATE) Date startDate, 
@@ -34,6 +36,7 @@ public class EventViewerRestController {
             return eventsService.searchEvents(startDate, numberOfDays, pageSize, page);
     }
 
+    @CrossOrigin
     @GetMapping("/{id}")
     public EventItem getEventDetails(
         @PathVariable("id") String id) {
