@@ -1,0 +1,4 @@
+steps:
+  # Build project
+- name: 'gcr.io/cloud-builders/mvn'
+  args: ['clean', 'install', '--quiet']
