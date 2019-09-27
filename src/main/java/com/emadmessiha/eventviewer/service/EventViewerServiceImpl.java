@@ -1,6 +1,13 @@
 package com.emadmessiha.eventviewer.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,9 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class EventViewerServiceImpl implements IEventViewerService {
@@ -36,9 +44,6 @@ public class EventViewerServiceImpl implements IEventViewerService {
 
     @Value("${spring.data.mongodb.uri}")
     private String mongodbUri;
-
-    @Value("${jsondata.resourcepath}")
-    private String jsonDataResourcePath;
 
     @Autowired
     ResourceLoader resourceLoader;
@@ -147,15 +152,41 @@ public class EventViewerServiceImpl implements IEventViewerService {
         return new EventItem(returnedDoc);
     }
 
+    public String storeFile(MultipartFile file) {
+        // Normalize file name
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        try {
+            // Check if the file's name contains invalid characters
+            if(fileName.contains("..")) {
+                throw new IllegalArgumentException("Sorry! Filename contains invalid path sequence " + fileName);
+            }
+
+            // Copy file to the target location (Replacing existing file with the same name)
+            Path targetLocation = Paths.get(fileName);
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+            return fileName;
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
+    }
+
     @Override
-    public Boolean reloadSeedData() {
+    public Boolean importFile(MultipartFile jsonFile) {
+        String fileName = storeFile(jsonFile);
+        if (fileName == null) {
+            return false;
+        }
         MongoClient mongoClient = getMongoClient();
         MongoCollection<Document> collection = getEventsCollection(mongoClient);
         Boolean success = true;
         Gson gson = new Gson();
         try {
-            Resource resource = resourceLoader.getResource(jsonDataResourcePath);
-            JsonReader reader = new JsonReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
+            File initialFile = new File(fileName);
+            InputStream targetStream = new FileInputStream(initialFile);
+            JsonReader reader = new JsonReader(new InputStreamReader(targetStream, "UTF-8"));
             reader.beginArray();
             collection.drop();
             while (reader.hasNext()) {

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/events")
@@ -43,9 +44,10 @@ public class EventViewerRestController {
             return eventsService.getEventDetails(id);
     }
 
-    @PostMapping("/reload")
-    public ResponseEntity<Object> reloadSeedData() {
-        return eventsService.reloadSeedData() ? 
+    @CrossOrigin
+    @PostMapping("/upload")
+    public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile file) {
+        return eventsService.importFile(file) ? 
             new ResponseEntity<>(HttpStatus.CREATED) : 
             new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

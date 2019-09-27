@@ -32,4 +32,4 @@ build/
 .vscode/
 
 ### Test Data ###
-data.json
+*.json
