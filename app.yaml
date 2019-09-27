@@ -1,4 +1,5 @@
-runtime: java
+service: event-viewer-core
+runtime: java8
 runtime_config:
   jdk: openjdk8
 env_variables:
