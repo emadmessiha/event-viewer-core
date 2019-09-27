@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/mvn'
-  args: ['clean'.'install','--quiet']
+  args: ['clean', 'install', '--quiet']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/event-viewer-253305/event-viewer-core', '.']
 images: ['gcr.io/event-viewer-253305/event-viewer-core']
