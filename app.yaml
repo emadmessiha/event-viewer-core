@@ -1,11 +1,4 @@
 service: event-viewer-core
-runtime: java8
-runtime_config:
-  jdk: openjdk8
+runtime: java
 env_variables:
   SPRING_DATA_MONGODB_URI: "mongodb+srv://root:root@cluster0-kiouo.gcp.mongodb.net/test?retryWrites=true&w=majority"
-handlers:
-- url: /.*
-  script: this field is required, but ignored
-manual_scaling: 
-  instances: 1
