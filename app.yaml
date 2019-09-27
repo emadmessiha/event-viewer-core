@@ -1,4 +1,5 @@
 service: event-viewer-core
 runtime: java
+env: flex
 env_variables:
   SPRING_DATA_MONGODB_URI: "mongodb+srv://root:root@cluster0-kiouo.gcp.mongodb.net/test?retryWrites=true&w=majority"
