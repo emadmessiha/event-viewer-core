@@ -2,3 +2,7 @@ steps:
   # Build project
 - name: 'gcr.io/cloud-builders/mvn'
   args: ['clean', 'install', '--quiet']
+
+  # Deploy app
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy', '--version=prod']
