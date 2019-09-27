@@ -1,0 +1,6 @@
+steps:
+- name: 'ubuntu'
+  args: ['bash', './mvnw clean install']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/event-viewer-253305/event-viewer-core', '.']
+images: ['gcr.io/event-viewer-253305/event-viewer-core']
