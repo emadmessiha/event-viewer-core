@@ -1,7 +1,7 @@
 steps:
   # Build project
 - name: 'gcr.io/cloud-builders/mvn'
-  args: ['clean', 'install', '--quiet']
+  args: ['clean', 'install', '--quiet', '-DpomFile=gcp_pom.xml']
 
   # Deploy app
 - name: 'gcr.io/cloud-builders/gcloud'
