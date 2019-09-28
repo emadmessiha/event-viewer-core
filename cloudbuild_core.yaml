@@ -10,3 +10,4 @@ steps:
   # Deploy app
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy', '--version=prod']
+images: ['gcr.io/event-viewer-253305/event-viewer-core']
