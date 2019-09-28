@@ -3,6 +3,10 @@ steps:
 - name: 'gcr.io/cloud-builders/mvn'
   args: ['clean', 'install', '--quiet']
 
+# Build & push docker image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/event-viewer-253305/event-viewer-core', '-f', 'Dockerfile_ev_core', '.']
+
   # Deploy app
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy', '--version=prod']
