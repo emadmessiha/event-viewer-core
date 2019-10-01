@@ -1,3 +1,8 @@
+FROM maven:3.5-jdk-8-alpine
+COPY . /app/
+WORKDIR /app
+RUN mvn clean install
+
 FROM openjdk:8-jdk-alpine
 VOLUME /tmp
 ENV SPRING_DATA_MONGODB_URI "mongodb+srv://root:root@cluster0-kiouo.gcp.mongodb.net/test?retryWrites=true&w=majority"
