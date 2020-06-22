@@ -24,6 +24,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -154,7 +155,7 @@ public class EventViewerServiceImpl implements IEventViewerService {
 
     public String storeFile(MultipartFile file) {
         // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = FilenameUtils.getName(StringUtils.cleanPath(file.getOriginalFilename()));
 
         try {
             // Check if the file's name contains invalid characters
