@@ -13,11 +13,15 @@ You will need to have Java JDK 8, Docker (Community Edition should be fine), and
 To run the code, use the following command from a terminal/command line
 
 1. Start the database (MongoDB) using `docker-compose up` (keep that terminal open). This will start a docker container running MongoDB on port 27017 as well as a web portal (Mongo Express) to browse that database: <http://localhost:8081/>
-2. Once the databas is up, run the spring boot application using `./mvnw spring-boot:run`
+2. Once the database is up, run the spring boot application using `./mvnw spring-boot:run`
 
 The application should now be running on <http://localhost:8080>
 
 To shutdown the server, simply hit Ctrl+C on your keyboard. To shutdown the database, hit Ctrl+C then run `docker-compose down`
+
+### Uploading sample data
+
+Sample expected data can be found in `sample-data` folder.
 
 ### Working with the code
 
