@@ -2,8 +2,6 @@ package com.emadmessiha.eventviewer.model;
 
 import java.util.List;
 
-import com.emadmessiha.eventviewer.model.EventItem;
-
 import lombok.Data;
 
 @Data

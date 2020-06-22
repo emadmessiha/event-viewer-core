@@ -1,7 +1,0 @@
-service: event-viewer-core
-# runtime: java
-runtime: custom
-env: flex
-# entrypoint: java -jar target/eventviewer-0.0.1.jar
-env_variables:
-  SPRING_DATA_MONGODB_URI: "mongodb+srv://root:root@cluster0-kiouo.gcp.mongodb.net/test?retryWrites=true&w=majority"
